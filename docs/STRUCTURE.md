@@ -1,0 +1,1 @@
+# This document stores information about how the code of the project is structured
