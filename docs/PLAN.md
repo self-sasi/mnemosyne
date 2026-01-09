@@ -23,3 +23,15 @@ mnemo restore --configPath /some/folder/
 # or
 mnemo restore --type postgres --backupPath /backup/ --port 1234
 ```
+
+Sample config file in json: 
+```json
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port": "1234",
+    "dbname": "mydb",
+    "username": "sasi",
+    "password": "123234"
+}
+```

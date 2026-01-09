@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var restoreConfigPath string
+
 var restoreCommand = &cobra.Command{
 	Use:     "restore",
 	Aliases: []string{"r"},
@@ -16,12 +18,15 @@ var restoreCommand = &cobra.Command{
 	It uses the configuration file specified by the --configPath flag to determine database connection details and backup settings. The config file can be of json or yaml types. If no path is provided, the command defaults to the current directory.
 	
 	Use this command with caution, as the existing database state will be overridden with the contents of the backup file.`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return config.SetupConfig(restoreConfigPath)
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(`configPath passed to restore command: %v\n`, config.UserConfigPath)
+		fmt.Printf(`configPath passed to restore command: %v\n`, restoreConfigPath)
 	},
 }
 
 func init() {
 	rootCommand.AddCommand(restoreCommand)
-	restoreCommand.Flags().StringVarP(&config.UserConfigPath, "configPath", "p", ".", "Path to a configuration file (YAML or JSON), or a directory containing a file named mnemo-config.")
+	restoreCommand.Flags().StringVarP(&restoreConfigPath, "configPath", "p", ".", "Path to a configuration file (YAML or JSON), or a directory containing a file named mnemo-config.")
 }
