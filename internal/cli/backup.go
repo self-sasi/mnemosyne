@@ -21,6 +21,7 @@ var backupCommand = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf(`configPath passed to backup command: %v\n`, backupConfigPath)
+		fmt.Println(config.GetConfig())
 	},
 }
 

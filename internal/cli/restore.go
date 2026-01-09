@@ -23,6 +23,7 @@ var restoreCommand = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf(`configPath passed to restore command: %v\n`, restoreConfigPath)
+		fmt.Println(config.GetConfig())
 	},
 }
 

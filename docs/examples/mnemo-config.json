@@ -1,0 +1,8 @@
+{
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "mnemo",
+    "username": "mnemo_user",
+    "password": "secret"
+}

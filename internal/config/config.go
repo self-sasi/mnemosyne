@@ -8,13 +8,38 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	Type     string `mapstructure:"type" yaml:"type" json:"type"`
+	Host     string `mapstructure:"host" yaml:"host" json:"host"`
+	Port     int    `mapstructure:"port" yaml:"port" json:"port"`
+	DbName   string `mapstructure:"dbname" yaml:"dbname" json:"dbname"`
+	UserName string `mapstructure:"username" yaml:"username" json:"username"`
+	Password string `mapstructure:"password" yaml:"password" json:"password"`
+}
+
+func (config Config) String() string {
+	return fmt.Sprintf(
+		"type=%s host=%s port=%d dbname=%s user=%s",
+		config.Type,
+		config.Host,
+		config.Port,
+		config.DbName,
+		config.UserName,
+	)
+}
+
 const defaultConfigFilename string = "mnemo-config"
+
+var config Config
 
 func SetupConfig(configPath string) error {
 	if err := loadConfig(configPath); err != nil {
 		return err
 	}
-	return viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
+	return viper.Unmarshal(&config)
 }
 
 func loadConfig(configPath string) error {
@@ -37,4 +62,8 @@ func loadConfig(configPath string) error {
 	}
 
 	return nil
+}
+
+func GetConfig() Config {
+	return config
 }
