@@ -7,16 +7,18 @@ type Registry struct {
 }
 
 // NewRegistry constructs and initializes a new [Registry].
+//
+// This constructor is guaranteed to return a non-nil safe-to-use [Registry].
 func NewRegistry() *Registry {
 	return &Registry{
 		engines: make(map[EngineName]Engine),
 	}
 }
 
-// AddEngine registers an [Engine] implementation under the given [EngineName]
-// in the registry.
-func (registry *Registry) AddEngine(engineName EngineName, engine Engine) {
-	registry.engines[engineName] = engine
+// AddEngine registers an [Engine] implementation under the given
+// [Engine.EngineName] in the registry.
+func (registry *Registry) AddEngine(engine Engine) {
+	registry.engines[engine.Name()] = engine
 }
 
 // GetEngine retrieves the registered [Engine] interface value for the given
