@@ -1,0 +1,1 @@
+The tool is still in early stages of development, will be open to open-source contributions once a decent amount of functionality is implemented.
