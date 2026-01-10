@@ -32,7 +32,7 @@ The name 'Mnemosyne' originates from Greek Mythology, where Mnemosyne is the Tit
   />
   <img
     src="./assets/images/arch-dark.drawio.png#gh-dark-mode-only"
-    width="70%"
+    width="600"
     alt="Architecture diagram (dark mode)"
   />
 </p>
