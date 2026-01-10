@@ -20,7 +20,7 @@
 
 mnemosyne is a database backup utility tool that can autonomously safeguard your database contents. 
 	
-The name 'Mnemosyne' originates from Greek Mythology, where Mnemosyne is the Titaness of Memory who personifies the power of rememberance, much like what this CLI tool aims to do.
+The name 'Mnemosyne' originates from Greek Mythology, where Mnemosyne is the Titaness of Memory who personifies the power of remembrance, much like what this CLI tool aims to do.
 
 ## Architecture
 
