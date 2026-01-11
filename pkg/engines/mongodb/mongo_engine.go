@@ -11,7 +11,7 @@ const mongoEngineName api.EngineName = "mongodb"
 type MongoEngine struct {
 }
 
-func NewEngine() *MongoEngine {
+func NewEngine() api.Engine {
 	return &MongoEngine{}
 }
 
