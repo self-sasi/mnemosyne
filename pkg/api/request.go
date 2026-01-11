@@ -15,6 +15,7 @@ type DBCredentials struct {
 type BackupRequest struct {
 	DBCredentials DBCredentials // info to connect with db
 	TargetPath    string        // where to store the backup files
+	Compress      bool          // if the backup files need to be compressed
 }
 
 // RestoreRequest defines the fields required to perform
