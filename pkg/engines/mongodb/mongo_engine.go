@@ -31,9 +31,10 @@ func (mongoEngine *MongoEngine) Name() api.EngineName {
 func (mongoEngine *MongoEngine) Backup(ctx context.Context, request api.BackupRequest) (api.BackupResponse, error) {
 	startTime := time.Now()
 
-	mongodump, err := mongoEngine.resolveMongoDump()
+	mongodump, err := utils.ResolveBinary("mongodump")
 	if err != nil {
-		return utils.BadBackupResponse(mongoEngineName, startTime, time.Now()), err
+		return utils.BadBackupResponse(mongoEngineName, startTime, time.Now()),
+			errors.New(`mongodump not found in PATH. Install "MongoDB Database Tools" or configure MongoDumpPath`)
 	}
 
 	if err := os.MkdirAll(request.TargetPath, 0o755); err != nil {
@@ -90,15 +91,4 @@ func mongoURI(credentials api.DBCredentials) string {
 	return fmt.Sprintf("mongodb://%s:%s@%s/%s",
 		credentials.UserName, credentials.Password, hostPort, credentials.DBName,
 	)
-}
-
-// why is this an instance method?
-// because the tool, later, should have the functionality to accept db tool path per backup request
-// different engines could talk to different versions of the same tool
-func (engine *MongoEngine) resolveMongoDump() (string, error) {
-	p, err := exec.LookPath("mongodump")
-	if err != nil {
-		return "", errors.New(`mongodump not found in PATH. Install "MongoDB Database Tools" or configure MongoDumpPath`)
-	}
-	return p, nil
 }
