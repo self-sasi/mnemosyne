@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -39,13 +40,18 @@ func (mySqlEngine *MySQLEngine) Backup(ctx context.Context, request api.BackupRe
 		return utils.BadBackupResponse(mySqlEngineName, startTime, time.Now()), fmt.Errorf("create target path: %w", err)
 	}
 
+	artifactPath := filepath.Join(
+		request.TargetPath,
+		utils.ArtifactName(mySqlEngineName, request.DBCredentials.DBName, "sql"),
+	)
+
 	args := []string{
 		"--databases", request.DBCredentials.DBName,
 		"--host=" + request.DBCredentials.Host,
 		"--port=" + strconv.Itoa(request.DBCredentials.Port),
 		"--user=" + request.DBCredentials.UserName,
 		"--password=" + request.DBCredentials.Password,
-		"--result-file=" + utils.ArtifactName(mySqlEngineName, request.DBCredentials.DBName, "sql"),
+		"--result-file=" + artifactPath,
 	}
 
 	cmd := exec.CommandContext(ctx, mysqldump, args...)
@@ -53,10 +59,25 @@ func (mySqlEngine *MySQLEngine) Backup(ctx context.Context, request api.BackupRe
 		return utils.BadBackupResponse(mySqlEngineName, startTime, time.Now()), err
 	}
 
+	if request.Compress {
+		gzipBin, err := utils.ResolveBinary("gzip")
+		if err != nil {
+			return utils.BadBackupResponse(mySqlEngineName, startTime, time.Now()),
+				errors.New(`gzip not found in PATH. Install gzip or disable compression`)
+		}
+
+		gzCmd := exec.CommandContext(ctx, gzipBin, "-f", artifactPath)
+		if err := gzCmd.Run(); err != nil {
+			return utils.BadBackupResponse(mySqlEngineName, startTime, time.Now()), err
+		}
+
+		artifactPath = artifactPath + ".gz"
+	}
+
 	return api.BackupResponse{
 		Status:       api.Success,
 		Engine:       mySqlEngineName,
-		ArtifactPath: request.TargetPath,
+		ArtifactPath: artifactPath,
 		StartedAt:    startTime,
 		FinishedAt:   time.Now(),
 	}, nil
