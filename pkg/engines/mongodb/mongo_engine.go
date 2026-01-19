@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/self-sasi/mnemosyne/pkg/api"
+	"github.com/self-sasi/mnemosyne/pkg/engines/utils"
 )
 
 const mongoEngineName api.EngineName = "mongodb"
@@ -28,15 +29,15 @@ func (mongoEngine *MongoEngine) Name() api.EngineName {
 }
 
 func (mongoEngine *MongoEngine) Backup(ctx context.Context, request api.BackupRequest) (api.BackupResponse, error) {
-	start := time.Now()
+	startTime := time.Now()
 
 	mongodump, err := mongoEngine.resolveMongoDump()
 	if err != nil {
-		return badBackupResponse(start), err
+		return utils.BadBackupResponse(mongoEngineName, startTime, time.Now()), err
 	}
 
 	if err := os.MkdirAll(request.TargetPath, 0o755); err != nil {
-		return badBackupResponse(start), fmt.Errorf("create target path: %w", err)
+		return utils.BadBackupResponse(mongoEngineName, startTime, time.Now()), fmt.Errorf("create target path: %w", err)
 	}
 
 	extension := ".archive"
@@ -48,7 +49,7 @@ func (mongoEngine *MongoEngine) Backup(ctx context.Context, request api.BackupRe
 		request.TargetPath,
 		fmt.Sprintf("mnemo_mongodb_%s_%s%s",
 			request.DBCredentials.DBName,
-			start.UTC().Format("20060102T150405Z"),
+			startTime.UTC().Format("20060102T150405Z"),
 			extension,
 		),
 	)
@@ -65,14 +66,14 @@ func (mongoEngine *MongoEngine) Backup(ctx context.Context, request api.BackupRe
 
 	cmd := exec.CommandContext(ctx, mongodump, args...)
 	if err := cmd.Run(); err != nil {
-		return badBackupResponse(start), err
+		return utils.BadBackupResponse(mongoEngineName, startTime, time.Now()), err
 	}
 
 	return api.BackupResponse{
 		Status:       api.Success,
 		Engine:       mongoEngineName,
 		ArtifactPath: archivePath,
-		StartedAt:    start,
+		StartedAt:    startTime,
 		FinishedAt:   time.Now(),
 	}, nil
 }
@@ -100,13 +101,4 @@ func (engine *MongoEngine) resolveMongoDump() (string, error) {
 		return "", errors.New(`mongodump not found in PATH. Install "MongoDB Database Tools" or configure MongoDumpPath`)
 	}
 	return p, nil
-}
-
-func badBackupResponse(startTime time.Time) api.BackupResponse {
-	return api.BackupResponse{
-		Status:     api.Failure,
-		Engine:     mongoEngineName,
-		StartedAt:  startTime,
-		FinishedAt: time.Now(),
-	}
 }
