@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os/exec"
 	"time"
 
@@ -18,4 +19,8 @@ func BadBackupResponse(engineName api.EngineName, startTime time.Time, finishTim
 
 func ResolveBinary(name string) (string, error) {
 	return exec.LookPath(name)
+}
+
+func ArtifactName(engineName api.EngineName, dbName string, extension string) string {
+	return fmt.Sprintf(`%v_%v_%v.%v`, engineName, dbName, time.Now(), extension)
 }
